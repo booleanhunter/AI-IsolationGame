@@ -209,11 +209,64 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
-        if self.time_left() < self.TIMER_THRESHOLD:
-            raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+
+
+        def max_val(self, game, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
+            if depth == 0:
+                return self.score(game, self)
+
+            legal_moves = game.get_legal_moves()
+            main_score = -99999
+
+            for each_move in legal_moves:
+                game_subbranch = game.forecast_move(each_move)
+                score = min_val(self, game_subbranch, depth - 1)
+                if score > main_score:
+                    best_move = each_move
+                    main_score = score
+
+            return main_score
+
+        def min_val(self, game, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
+            if depth == 0:
+                return self.score(game, self)
+
+            legal_moves = game.get_legal_moves()
+            main_score = float('inf')
+
+            for each_move in legal_moves:
+                game_subbranch = game.forecast_move(each_move)
+                score = max_val(self, game_subbranch, depth - 1)
+                if score < main_score:
+                    best_move = each_move
+                    main_score = score
+
+            return main_score
+
+        if not game.get_legal_moves():
+            return (-1,-1)
+        
+        main_score = float('-inf')
+        legal_moves = game.get_legal_moves()
+        best_move = legal_moves[0]
+
+        for each_move in legal_moves:
+            game_subbranch = game.forecast_move(each_move)
+            score = min_val(self, game_subbranch, depth-1)
+            if score > main_score:
+                best_move = each_move
+                main_score = score
+
+
+        return best_move
 
 
 class AlphaBetaPlayer(IsolationPlayer):
