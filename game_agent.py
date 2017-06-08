@@ -305,10 +305,29 @@ class AlphaBetaPlayer(IsolationPlayer):
             Board coordinates corresponding to a legal move; may return
             (-1, -1) if there are no available legal moves.
         """
-        self.time_left = time_left
 
         # TODO: finish this function!
-        raise NotImplementedError
+        
+        self.time_left = time_left
+
+        # Initialize the best move so that this function returns something
+        # in case the search fails due to timeout
+        best_move = (-1, -1)
+        depth = 1
+
+        try:
+            # The try/except block will automatically catch the exception
+            # raised when the timer is about to expire.
+            
+            while self.time_left() > self.TIMER_THRESHOLD:
+                best_move = self.alphabeta(game, depth)
+                depth += 1
+
+        except SearchTimeout:
+            pass # Handle any actions required after timeout as needed
+
+        # Return the best move from the last completed search iteration
+        return best_move
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
@@ -355,6 +374,9 @@ class AlphaBetaPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
+        
+        # TODO: finish this function!
+
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
