@@ -358,5 +358,71 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        def max_value(self, game, depth, alpha, beta):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
+            legal_moves = game.get_legal_moves()
+
+            if depth == 0 or len(legal_moves) == 0:
+                return self.score(game, self)
+
+            
+            main_score = float('-inf')
+
+            for each_move in legal_moves:
+                game_subbranch = game.forecast_move(each_move)
+                score = min_value(self, game_subbranch, depth - 1, alpha, beta)
+                main_score = max(main_score, score)
+
+                if main_score >= beta:
+                    return main_score
+
+                alpha = max(alpha, main_score)
+
+            return main_score
+
+        def min_value(self, game, depth, alpha, beta):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
+            legal_moves = game.get_legal_moves()
+
+            if depth == 0 or len(legal_moves) == 0:
+                return self.score(game, self)
+
+            
+            main_score = float('inf')
+
+            for each_move in legal_moves:
+                game_subbranch = game.forecast_move(each_move)
+
+                score = max_value(self, game_subbranch, depth - 1, alpha, beta)
+                main_score = min(main_score, score)
+
+                if main_score <= alpha:
+                    return main_score
+
+                beta = min(beta, main_score)
+
+            return main_score
+
+
+
+        legal_moves = game.get_legal_moves()
+        if not legal_moves:
+            return (-1,-1)        
+        
+        best_move = legal_moves[0]
+        main_score = float('-inf')
+
+        for each_move in legal_moves:
+            game_subbranch = game.forecast_move(each_move)
+            score = min_value(self, game_subbranch, depth-1, alpha, beta)
+            if score >= main_score:
+                main_score = score
+                best_move = each_move
+
+            alpha = max(alpha, main_score)
+
+        return best_move
