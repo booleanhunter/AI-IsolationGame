@@ -9,6 +9,17 @@ class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
     pass
 
+def near_to_Walls(move, walls):
+    for wall in walls:
+        if move in wall:
+            return True
+        
+    return False
+
+
+def percent_of_board_filled(game):
+    blank_spaces = game.get_blank_spaces()
+    return int( (len(blank_spaces) / (game.width * game.height)) * 100)
 
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
@@ -35,7 +46,18 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+
+
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    score_2 = custom_score_2(game, player)
+    score_3 = custom_score_3(game, player)
+
+    return 0.3 * score_2 + 0.7 * score_3
 
 
 def custom_score_2(game, player):
@@ -61,7 +83,17 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves - 3 * opp_moves)
 
 
 def custom_score_3(game, player):
@@ -87,7 +119,47 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+
+    walls = [
+        [(0, i) for i in range(game.width)],
+        [(i, 0) for i in range(game.height)],
+        [(game.width - 1, i) for i in range(game.width)],
+        [(i, game.height - 1) for i in range(game.height)]
+    ]
+
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    agent_moves = game.get_legal_moves(player)
+    opponent_moves = game.get_legal_moves(game.get_opponent(player))
+
+    agent_score = 0
+    opponent_score = 0
+
+    for move in agent_moves:
+        if percent_of_board_filled(game) < 40:
+            agent_score += 10
+        elif percent_of_board_filled(game) > 40 and percent_of_board_filled(game) < 75 and near_to_Walls(move, walls):
+            agent_score -= 25
+        elif percent_of_board_filled(game) > 75 and near_to_Walls(move, walls):
+            agent_score -= 35
+        elif not near_to_Walls(move, walls):
+            agent_score += 10
+
+    for move in opponent_moves:
+        if percent_of_board_filled(game) < 40:
+            opponent_score += 10
+        elif percent_of_board_filled(game) > 40 and percent_of_board_filled(game) < 75 and near_to_Walls(move, walls):
+            opponent_score -= 25
+        elif percent_of_board_filled(game) > 75 and near_to_Walls(move, walls):
+            opponent_score -= 35
+        elif not near_to_Walls(move, walls):
+            opponent_score += 10
+
+    return float(agent_score - opponent_score)
 
 
 class IsolationPlayer:
@@ -112,7 +184,7 @@ class IsolationPlayer:
         positive value large enough to allow the function to return before the
         timer expires.
     """
-    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+    def __init__(self, search_depth=3, score_fn=custom_score, timeout=20.):
         self.search_depth = search_depth
         self.score = score_fn
         self.time_left = None
@@ -251,6 +323,9 @@ class MinimaxPlayer(IsolationPlayer):
             return main_score
 
         
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
         main_score = float('-inf')
         best_move = (-1,-1)
         legal_moves = game.get_legal_moves()
@@ -330,7 +405,8 @@ class AlphaBetaPlayer(IsolationPlayer):
                 depth += 1
 
         except SearchTimeout:
-            return best_move # Handle any actions required after timeout as needed
+            return best_move
+            pass # Handle any actions required after timeout as needed
 
         # Return the best move from the last completed search iteration
         return best_move
@@ -384,6 +460,9 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         # TODO: finish this function!
 
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
         def max_value(game, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
@@ -432,10 +511,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 beta = min(beta, main_score)
 
             return main_score
-
-
-        if self.time_left() < self.TIMER_THRESHOLD:
-            raise SearchTimeout()
+            
 
         best_move = (-1,-1)
 
@@ -459,5 +535,3 @@ class AlphaBetaPlayer(IsolationPlayer):
             alpha = max(alpha, main_score)
 
         return best_move
-
-
