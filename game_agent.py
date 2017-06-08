@@ -212,7 +212,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         # TODO: finish this function!
 
-        def max_val(self, game, depth):
+        def max_val(game, depth):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
 
@@ -224,14 +224,14 @@ class MinimaxPlayer(IsolationPlayer):
 
             for each_move in legal_moves:
                 game_subbranch = game.forecast_move(each_move)
-                score = min_val(self, game_subbranch, depth - 1)
+                score = min_val(game_subbranch, depth - 1)
                 if score > main_score:
                     best_move = each_move
                     main_score = score
 
             return main_score
 
-        def min_val(self, game, depth):
+        def min_val(game, depth):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
 
@@ -243,7 +243,7 @@ class MinimaxPlayer(IsolationPlayer):
 
             for each_move in legal_moves:
                 game_subbranch = game.forecast_move(each_move)
-                score = max_val(self, game_subbranch, depth - 1)
+                score = max_val(game_subbranch, depth - 1)
                 if score < main_score:
                     best_move = each_move
                     main_score = score
@@ -260,7 +260,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         for each_move in legal_moves:
             game_subbranch = game.forecast_move(each_move)
-            score = min_val(self, game_subbranch, depth-1)
+            score = min_val(game_subbranch, depth-1)
             if score > main_score:
                 best_move = each_move
                 main_score = score
@@ -330,8 +330,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 depth += 1
 
         except SearchTimeout:
-            return best_move
-            pass # Handle any actions required after timeout as needed
+            return best_move # Handle any actions required after timeout as needed
 
         # Return the best move from the last completed search iteration
         return best_move
@@ -385,7 +384,7 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         # TODO: finish this function!
 
-        def max_value(self, game, depth, alpha, beta):
+        def max_value(game, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
 
@@ -399,7 +398,7 @@ class AlphaBetaPlayer(IsolationPlayer):
 
             for each_move in legal_moves:
                 game_subbranch = game.forecast_move(each_move)
-                score = min_value(self, game_subbranch, depth - 1, alpha, beta)
+                score = min_value(game_subbranch, depth - 1, alpha, beta)
                 main_score = max(main_score, score)
 
                 if main_score >= beta:
@@ -409,7 +408,7 @@ class AlphaBetaPlayer(IsolationPlayer):
 
             return main_score
 
-        def min_value(self, game, depth, alpha, beta):
+        def min_value(game, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
 
@@ -424,7 +423,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             for each_move in legal_moves:
                 game_subbranch = game.forecast_move(each_move)
 
-                score = max_value(self, game_subbranch, depth - 1, alpha, beta)
+                score = max_value(game_subbranch, depth - 1, alpha, beta)
                 main_score = min(main_score, score)
 
                 if main_score <= alpha:
@@ -449,7 +448,7 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         for each_move in legal_moves:
             game_subbranch = game.forecast_move(each_move)
-            score = min_value(self, game_subbranch, depth-1, alpha, beta)
+            score = min_value(game_subbranch, depth-1, alpha, beta)
             if score >= main_score:
                 main_score = score
                 best_move = each_move
