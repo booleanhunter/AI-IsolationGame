@@ -529,9 +529,9 @@ class AlphaBetaPlayer(IsolationPlayer):
                 main_score = score
                 best_move = each_move
 
-            if main_score >= beta:
+            if score >= beta:
                 return best_move
 
-            alpha = max(alpha, main_score)
+            alpha = max(alpha, score)
 
         return best_move
