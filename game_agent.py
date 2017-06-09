@@ -511,7 +511,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 beta = min(beta, main_score)
 
             return main_score
-            
+
 
         best_move = (-1,-1)
 
@@ -529,7 +529,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 main_score = score
                 best_move = each_move
 
-            if main_score > beta:
+            if main_score >= beta:
                 return best_move
 
             alpha = max(alpha, main_score)
